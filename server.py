@@ -79,7 +79,7 @@ net_g = SynthesizerTrn(
     **hps.model).to(dev)
 _ = net_g.eval()
 
-_ = utils.load_checkpoint("logs/G_649000.pth", net_g, None,skip_optimizer=True)
+_ = utils.load_checkpoint("logs/as/G_8000.pth", net_g, None,skip_optimizer=True)
 
 @app.route("/",methods=['GET','POST'])
 def main():
@@ -119,3 +119,6 @@ def main():
             out, _ = process.communicate(input=wav.read())
             return Response(out, mimetype="audio/mpeg")
         return Response(wav.read(), mimetype="audio/wav")
+
+if __name__=="__main__":
+    app.run(host="127.0.0.1", port=8080, debug=True)

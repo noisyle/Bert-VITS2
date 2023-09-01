@@ -168,12 +168,12 @@ def get_hparams(init=True):
     config_path = args.config
     config_save_path = os.path.join(model_dir, "config.json")
     if init:
-        with open(config_path, "r") as f:
+        with open(config_path, "r", encoding='utf-8') as f:
             data = f.read()
-        with open(config_save_path, "w") as f:
+        with open(config_save_path, "w", encoding='utf-8') as f:
             f.write(data)
     else:
-        with open(config_save_path, "r") as f:
+        with open(config_save_path, "r", encoding='utf-8') as f:
             data = f.read()
     config = json.loads(data)
 
@@ -216,7 +216,7 @@ def get_hparams_from_dir(model_dir):
 
 
 def get_hparams_from_file(config_path):
-    with open(config_path, "r") as f:
+    with open(config_path, "r", encoding='utf-8') as f:
         data = f.read()
     config = json.loads(data)
 
@@ -236,12 +236,12 @@ def check_git_hash(model_dir):
 
     path = os.path.join(model_dir, "githash")
     if os.path.exists(path):
-        saved_hash = open(path).read()
+        saved_hash = open(path, encoding='utf-8').read()
         if saved_hash != cur_hash:
             logger.warn("git hash values are different. {}(saved) != {}(current)".format(
                 saved_hash[:8], cur_hash[:8]))
     else:
-        open(path, "w").write(cur_hash)
+        open(path, "w", encoding='utf-8').write(cur_hash)
 
 
 def get_logger(model_dir, filename="train.log"):

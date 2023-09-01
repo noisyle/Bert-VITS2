@@ -5,7 +5,7 @@ import commons
 import utils
 from data_utils import TextAudioSpeakerLoader, TextAudioSpeakerCollate
 from tqdm import tqdm
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 
 from text import cleaned_text_to_sequence, get_bert
 
@@ -40,9 +40,16 @@ def process_line(line):
         assert bert.shape[-1] == len(phone)
         torch.save(bert, bert_path)
 
-with open(hps.data.training_files) as f:
-    lines = f.readlines()
+lines = []
+with open(hps.data.training_files, encoding='utf-8') as f:
+    lines += f.readlines()
+with open(hps.data.validation_files, encoding='utf-8') as f:
+    lines += f.readlines()
 
-with Pool(processes=12) as pool: #A100 suitable config,if coom,please decrease the processess number.
-    for _ in tqdm(pool.imap_unordered(process_line, lines)):
-        pass
+for line in tqdm(lines):
+    process_line(line)
+
+# processs = cpu_count()-2 if cpu_count() >4 else 1
+# with Pool(processes=processs) as pool: #A100 suitable config,if coom,please decrease the processess number.
+#     for _ in tqdm(pool.imap_unordered(process_line, lines)):
+#         pass

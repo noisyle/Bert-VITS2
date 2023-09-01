@@ -6,12 +6,12 @@ from text.cleaner import clean_text
 from collections import defaultdict
 stage = [1,2,3]
 
-transcription_path = 'filelists/genshin.list'
+transcription_path = 'filelists/as.list'
 train_path = 'filelists/train.list'
 val_path = 'filelists/val.list'
 config_path = "configs/config.json"
 val_per_spk = 4
-max_val_total = 8
+max_val_total = 16
 
 if 1 in stage:
     with open( transcription_path+'.cleaned', 'w', encoding='utf-8') as f:
@@ -59,7 +59,7 @@ if 2 in stage:
 
 if 3 in stage:
     assert 2 in stage
-    config = json.load(open(config_path))
+    config = json.load(open(config_path, encoding='utf-8'))
     config["data"]['spk2id'] = spk_id_map
     with open(config_path, 'w', encoding='utf-8') as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
