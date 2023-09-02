@@ -2,7 +2,7 @@ import os
 import json
 import torchaudio
 
-config_file = "./configs/config.json"
+config_file = "./configs/base.json"
 raw_audio_dir = "./workspace/raw_audio/"
 denoise_audio_dir = "./workspace/denoised_audio/"
 filelist = list(os.walk(raw_audio_dir))[0][2]

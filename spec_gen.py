@@ -9,7 +9,7 @@ from multiprocessing import Pool, cpu_count
 
 from text import cleaned_text_to_sequence, get_bert
 
-config_path = 'configs/config.json'
+config_path = 'workspace/config.json'
 hps = utils.get_hparams_from_file(config_path)
 
 def process_line(line):

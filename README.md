@@ -45,10 +45,10 @@ python spec_gen.py
 
 ## 训练
 ```
-python train_ms.py -c ./configs/config.json -m as
+python train_ms.py -m test
 ```
 
 ## 推理
 ```
-python webui.py -c ./configs/config.json -m ./logs/as/G_8000.pth
+python webui.py -m ./logs/test/G_2000.pth
 ```
