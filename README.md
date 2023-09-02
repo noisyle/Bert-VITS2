@@ -25,7 +25,8 @@ cd monotonic_align && python setup.py build_ext --inplace && cd ..
 *[下载 bert 模型](https://huggingface.co/hfl/chinese-roberta-wwm-ext-large)，并放置到 bert/chinese-roberta-wwm-ext-large 目录中*
 
 ## 使用
-- 首先将训练用的 wav 格式音频文件放置到 workspace/raw_audio 目录下，文件命名规则为 <说话人>_<序号>.wav，如 paimeng_1.wav、paimeng_2.wav。
+- 首先将训练用的 wav 格式音频文件放置到 workspace/raw_audio 目录下。
+- 文件命名规则为 <说话人>_<任意数字>.wav，如 paimeng_1.wav、paimeng_2.wav。
 - 可以同时放置多个说话人的多个音频文件。
 ### 提取人声
 ```
@@ -68,11 +69,11 @@ python webui.py -m ./logs/test/G_2000.pth
 ```
 - Google Colab 等场合可以使用 `--share` 参数，生成可内网穿透的链接。
 ```
-python webui.py -m ./logs/test/G_2000.pth --share
+python webui.py -c ./logs/test/config.json -m ./logs/test/G_2000.pth --share
 ```
 ### 推理 API
 - 运行如下命令后会启动 API 并监听 `http://0.0.0.0:8000`。
 - 可访问 `http://127.0.0.1:8000/docs` 查看 API 手册。
 ```
-python api.py -m ./logs/test/G_2000.pth
+python api.py -c ./logs/test/config.json -m ./logs/test/G_2000.pth
 ```

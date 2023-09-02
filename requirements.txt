@@ -1,9 +1,9 @@
 Cython
-librosa==0.9.1
+librosa
 matplotlib
 numpy
 phonemizer
-scikit-learn==1.0.2
+scikit-learn
 scipy
 tensorboard
 torch
@@ -18,7 +18,7 @@ jieba
 transformers
 demucs
 openai-whisper
-imageio==2.4.1
+imageio
 moviepy
 gradio
 fastapi
