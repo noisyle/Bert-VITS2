@@ -78,4 +78,4 @@ python webui.py -c ./logs/test/config.json -m ./logs/test/G_2000.pth --share
 python api.py -c ./logs/test/config.json -m ./logs/test/G_2000.pth
 ```
 ## Google Colab
-- 参考 colab.ipynb
+- 参考 [colab.ipynb](colab.ipynb)
