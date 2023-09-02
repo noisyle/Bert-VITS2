@@ -8,7 +8,7 @@ import torch.utils.data
 import commons
 from mel_processing import spectrogram_torch, mel_spectrogram_torch, spec_to_mel_torch
 from utils import load_wav_to_torch, load_filepaths_and_text
-from text import cleaned_text_to_sequence
+from text import cleaned_text_to_sequence, get_bert
 
 """Multi speaker version"""
 
@@ -135,10 +135,10 @@ class TextAudioSpeakerLoader(torch.utils.data.Dataset):
             bert = torch.load(bert_path)
             assert bert.shape[-1] == len(phone)
         except:
-            #bert = get_bert(text, word2ph, language_str)
-            #torch.save(bert, bert_path)
-            print(bert.shape[-1], bert_path, text, pold)
-            #assert bert.shape[-1] == len(phone)
+            bert = get_bert(text, word2ph, language_str)
+            torch.save(bert, bert_path)
+            #print(bert.shape[-1], bert_path, text, pold)
+            assert bert.shape[-1] == len(phone)
 
         assert bert.shape[-1] == len(phone), (
         bert.shape, len(phone), sum(word2ph), p1, p2, t1, t2, pold, pold2, word2ph, text, w2pho)
@@ -285,6 +285,8 @@ class DistributedBucketSampler(torch.utils.data.distributed.DistributedSampler):
         for i in range(len(self.buckets)):
             bucket = self.buckets[i]
             len_bucket = len(bucket)
+            if (len_bucket == 0):
+                continue
             ids_bucket = indices[i]
             num_samples_bucket = self.num_samples_per_bucket[i]
 

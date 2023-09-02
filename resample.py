@@ -27,7 +27,7 @@ def process(item):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--sr", type=int, default=44100, help="sampling rate")
-    parser.add_argument("--in_dir", type=str, default="./workspace/segmented_character_voice", help="path to source dir")
+    parser.add_argument("--in_dir", type=str, default="./workspace/segmented_audio", help="path to source dir")
     parser.add_argument("--out_dir", type=str, default="./workspace/dataset", help="path to target dir")
     args = parser.parse_args()
     # processs = 8

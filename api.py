@@ -6,8 +6,13 @@ from models import SynthesizerTrn
 from text.symbols import symbols
 from text import cleaned_text_to_sequence, get_bert
 from text.cleaner import clean_text
-import gradio as gr
-import webbrowser
+from fastapi import FastAPI, Body
+from fastapi.responses import Response
+from webui import infer
+import uvicorn
+from scipy.io import wavfile
+from io import BytesIO
+import ffmpeg
 
 def get_text(text, language_str, hps):
     norm_text, phone, tone, word2ph = clean_text(text, language_str)
@@ -43,18 +48,39 @@ def infer(text, sdp_ratio, noise_scale, noise_scale_w, length_scale, sid):
                            , noise_scale=noise_scale, noise_scale_w=noise_scale_w, length_scale=length_scale)[0][0,0].data.cpu().float().numpy()
         return audio
 
-def tts_fn(text, speaker, sdp_ratio, noise, noisew, length):
+app = FastAPI()
+
+@app.post("/v1/tts")
+def tts(speaker: str = Body(..., title="说话人", embed=True),
+        text: str = Body(..., title="文本", embed=True),
+        sdp_ratio: float = Body(0.2, embed=True),
+        noise: float = Body(0.5, embed=True),
+        noisew: float = Body(0.6, embed=True),
+        length: float = Body(1.0, embed=True),
+        format: str = Body('wav', embed=True)):
     with torch.no_grad():
         audio = infer(text, sdp_ratio, noise, noisew, length, speaker)
     torch.cuda.empty_cache()
-    return "Success", (hps.data.sampling_rate, audio)
+    wav = BytesIO()
+    wavfile.write(wav, hps.data.sampling_rate, audio)
+    wav.seek(0)
+    if format == "mp3":
+        process = (
+            ffmpeg
+                .input("pipe:", format='wav', channel_layout="mono")
+                .output("pipe:", format='mp3', audio_bitrate="320k")
+                .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
+        )
+        out, _ = process.communicate(input=wav.read())
+        return Response(out, headers={"Content-Disposition": 'attachment; filename="audio.mp3"'}, media_type="audio/mpeg")
+    else:
+        return Response(wav.read(), headers={"Content-Disposition": 'attachment; filename="audio.wav"'}, media_type="audio/wav")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", default="./logs/test/G_2000.pth", help="path of your model")
     parser.add_argument("-c", "--config", default="./workspace/config.json", help="path of your config file")
-    parser.add_argument("--share", default=False, help="make link public")
 
     args = parser.parse_args()
     hps = utils.get_hparams_from_file(args.config)
@@ -70,27 +96,4 @@ if __name__ == "__main__":
 
     _ = utils.load_checkpoint(args.model, net_g, None,skip_optimizer=True)
 
-    speaker_ids = hps.data.spk2id
-    speakers = list(speaker_ids.keys())
-    app = gr.Blocks()
-    with app:
-        with gr.Row():
-            with gr.Column():
-                text = gr.TextArea(label="Text", placeholder="Input Text Here",
-                                      value="吃葡萄不吐葡萄皮，不吃葡萄倒吐葡萄皮。")
-                speaker = gr.Dropdown(choices=speakers, value=speakers[0], label='Speaker')
-                sdp_ratio = gr.Slider(minimum=0.1, maximum=2, value=0.2, step=0.1, label='SDP Ratio')
-                noise_scale = gr.Slider(minimum=0.1, maximum=2, value=0.5, step=0.1, label='Noise Scale')
-                noise_scale_w = gr.Slider(minimum=0.1, maximum=2, value=0.6, step=0.1, label='Noise Scale W')
-                length_scale = gr.Slider(minimum=0.1, maximum=2, value=1.0, step=0.1, label='Length Scale')
-                btn = gr.Button("Generate!", variant="primary")
-            with gr.Column():
-                text_output = gr.Textbox(label="Message")
-                audio_output = gr.Audio(label="Output Audio")
-
-        btn.click(tts_fn,
-                inputs=[text, speaker, sdp_ratio, noise_scale, noise_scale_w, length_scale],
-                outputs=[text_output, audio_output])
-    
-    webbrowser.open("http://127.0.0.1:7860")
-    app.launch(share=args.share)
+    uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)

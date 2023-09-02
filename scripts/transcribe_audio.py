@@ -9,10 +9,9 @@ import re
 
 config_file = "./configs/base.json"
 parent_dir = "./workspace/denoised_audio/"
-segments_dir = "./workspace/segmented_character_voice/"
+segments_dir = "./workspace/segmented_audio/"
 dataset_dir = "./workspace/dataset/"
 
-filelist = list(os.walk(parent_dir))[0][2]
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--languages", default="CJE")
@@ -39,6 +38,13 @@ if __name__ == "__main__":
     target_sr = hps['data']['sampling_rate']
     model = whisper.load_model(args.whisper_size)
     speaker_annos = []
+
+    if not os.path.exists(segments_dir):
+        os.mkdir(segments_dir)
+    if not os.path.exists(dataset_dir):
+        os.mkdir(dataset_dir)
+
+    filelist = list(os.walk(parent_dir))[0][2]
     for file in filelist:
         print(f"transcribing {parent_dir + file}...\n")
         options = dict(beam_size=5, best_of=5)

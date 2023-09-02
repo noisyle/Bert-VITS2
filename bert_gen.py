@@ -17,7 +17,6 @@ def process_line(line):
     phone = phones.split(" ")
     tone = [int(i) for i in tone.split(" ")]
     word2ph = [int(i) for i in word2ph.split(" ")]
-    # print(text, word2ph,phone, tone, language_str)
     w2pho = [i for i in word2ph]
     word2ph = [i for i in word2ph]
     phone, tone, language = cleaned_text_to_sequence(phone, tone, language_str)
@@ -40,11 +39,14 @@ def process_line(line):
         assert bert.shape[-1] == len(phone)
         torch.save(bert, bert_path)
 
+
 lines = []
 with open(hps.data.training_files, encoding='utf-8') as f:
-    lines += f.readlines()
+    lines.extend(f.readlines())
+
 with open(hps.data.validation_files, encoding='utf-8') as f:
-    lines += f.readlines()
+    lines.extend(f.readlines())
+
 
 for line in tqdm(lines):
     process_line(line)
