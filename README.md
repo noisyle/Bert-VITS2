@@ -17,7 +17,7 @@ pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --e
 pip install -r requirements.txt
 conda install -c conda-forge ffmpeg
 ```
-### 构建 monotonic_align
+### 编译 monotonic_align
 ```
 cd monotonic_align && python setup.py build_ext --inplace && cd ..
 ```
@@ -63,9 +63,9 @@ python train_ms.py -m test
 python train_ms.py -m test --resume
 ```
 ### 推理 WebUI
-- 运行如下命令会自动在浏览器中打开 `http://127.0.0.1:7860`，使用 `-m` 参数指定模型文件
+- 运行如下命令会自动在浏览器中打开 `http://127.0.0.1:7860`，使用 `-c` 参数指定配置文件，`-m` 参数指定权重文件。
 ```
-python webui.py -m ./logs/test/G_2000.pth
+python webui.py -c ./logs/test/config.json -m ./logs/test/G_2000.pth
 ```
 - Google Colab 等场合可以使用 `--share` 参数，生成可内网穿透的链接。
 ```
@@ -77,3 +77,5 @@ python webui.py -c ./logs/test/config.json -m ./logs/test/G_2000.pth --share
 ```
 python api.py -c ./logs/test/config.json -m ./logs/test/G_2000.pth
 ```
+## Google Colab
+- 参考 colab.ipynb
